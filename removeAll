@@ -1,0 +1,38 @@
+    //written by Paulina and Makenna
+    //removes any elements from SkipList that are contained in collection c
+    public boolean removeAll(Collection c){
+        boolean modified = false;
+        
+        //convert collection to list so we can iterate through it and get value
+        List list = new ArrayList(c);
+
+        //iterate through list, remove each value
+        //remove function will not alter SkipList if it does not contain value
+        for (int i = 0; i < list.size(); i++){
+            remove(list.get(i));
+            modified = true;
+        }
+    return modified;
+    }
+    
+   //Written by Paulina and Makenna
+    public boolean testRemoveAll(boolean verbose)  {
+        //creates a new SkipList called testList
+        List<Integer> test = new SkipList<Integer>();
+
+        test.add(5);
+        test.add(17);
+        test.add(42);
+        List<Integer> c = new ArrayList<>();
+
+        c.add(17);
+        c.add(42);
+        if (test.removeAll(c) == false) {
+            return false;
+        }
+
+        return (
+            (test.get(0) == 5) &&
+            (test.size() == 1)
+        );
+    }  
