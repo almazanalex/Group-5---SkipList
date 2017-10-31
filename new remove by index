@@ -1,0 +1,86 @@
+ public E remove(int index)
+    {
+        if ( index < 0 || index >= this.count ) {
+            throw new IndexOutOfBoundsException ("chosen index is out of bounds");
+        } else if(index == 0) {// special case
+            Node<E> currentNode = heads.get(0);
+            E currentData = currentNode.value();
+
+            for(int i = 0; i < currentNode.levels(); i++) {
+                heads.set(i,currentNode.next(i));
+            }
+            this.count--;
+            return currentData;
+
+
+        }else {// normal case
+            // data of node corresponding to index
+            E currentData = get(index);
+
+            // Cast e to Comparable to use the CompareTo method
+            @SuppressWarnings("unchecked")
+            Comparable<E> ce = (Comparable<E>) currentData;
+
+            // filling removePath with all the nodes to potentially be updated
+            ArrayList<Node<E>> removePath = new ArrayList<Node<E>>(MAX_LEVELS);
+            for (int i = 0; i < MAX_LEVELS; i++) {
+                removePath.add(i, null);
+            }
+
+            Node<E> finger = null; // which means starting at the head
+            for (int lvl = MAX_LEVELS - 1; lvl >= 0; lvl--) {
+                if (finger == null) { // when finger is at the head
+                    if (heads.get(lvl) == null || ce.compareTo(heads.get(lvl).value()) < 0) {
+                        removePath.set(lvl, null); // we'll have to update the head
+                    } else { // traveling on the level
+                        finger = heads.get(lvl);
+                        while ((finger.next(lvl) != null) && ce.compareTo(finger.next(lvl).value()) > 0) {
+                            finger = finger.next(lvl);
+                        }
+                        removePath.set(lvl, finger);
+                    }
+                } else{ // finger is at a node
+                    while ((finger.next(lvl) != null) && ce.compareTo(finger.next(lvl).value()) > 0) {
+                        finger = finger.next(lvl);
+                    }
+                    removePath.set(lvl, finger);
+                }
+            }
+
+            // node corresponding to index
+            Node<E> currentNode = removePath.get(0);
+            // modify the reference
+            for(int i = 0; i < currentNode.levels(); i++) {
+                removePath.get(i).setNext(i, currentNode.next(i));
+            }
+            // modify the size of list
+            this.count--;
+            return currentNode.value();
+
+        }
+    }
+    // Test the remove () method
+
+    public boolean testRemove(boolean verbose)  {
+        //creates a new SkipList called testList
+        List<Integer> testList = new SkipList<Integer>();
+
+        testList.add(1);
+        testList.add(3);
+        testList.add(8);
+        testList.add(4);
+        testList.add(23);
+        testList.add(786);
+        testList.add(4);
+        testList.add(9);
+        
+        testList.remove(0);
+        testList.remove(4);
+
+        
+        return (
+            (testList.get(0) == 3) &&
+            (testList.get(1) == 4) &&
+            (testList.get(4) == 9)
+            );
+    }
