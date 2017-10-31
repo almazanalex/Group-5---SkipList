@@ -1,0 +1,84 @@
+    public boolean remove(Object o)
+    {
+        //Cast e to Comparable to use the CompareTo method
+        @SuppressWarnings("unchecked")
+        Comparable<E> ce = (Comparable<E>)o;
+
+        // filling addPath with all the nodes to potentially be updated
+        ArrayList<Node<E>> removePath = new ArrayList<Node<E>>(MAX_LEVELS);
+        for (int i = 0; i < MAX_LEVELS; i++) {
+            removePath.add(i,null);
+        }
+
+        Node<E> finger = null; // which means starting at the head
+        for (int lvl = MAX_LEVELS - 1; lvl >= 0; lvl--) {
+            if (finger == null) { // when finger is at the head
+                if (heads.get(lvl) == null || ce.compareTo(heads.get(lvl).value()) <= 0) {
+                    removePath.set(lvl, null); // we'll have to update the head
+                } else { // traveling on the level
+                    finger = heads.get(lvl);
+                    while ( (finger.next(lvl) != null)
+                        && ce.compareTo(finger.next(lvl).value()) > 0 ) {
+                        finger = finger.next(lvl);
+                    }
+                    removePath.set(lvl, finger);
+                }
+            } else { // finger is at a node
+                while ( (finger.next(lvl) != null)
+                    && ce.compareTo(finger.next(lvl).value()) > 0 ) {
+                    finger = finger.next(lvl);
+                }
+                removePath.set(lvl,finger);
+            }
+        }
+
+        Node<E> removeNode;
+        if (removePath.get(0) == null) { // the head is pointing to the element to be removed
+            removeNode = heads.get(0);
+        } else { // another node is pointing to the element to be removed
+            removeNode = removePath.get(0).next(0);
+        }
+
+        // check to see if the node to remove is in the skiplist
+        // is removeNode the right value to remove?
+        if ( (removeNode == null) || (!ce.equals(removeNode.value() ) ) ) { 
+            return false;
+        } 
+        int removeNodeLevels = removeNode.levels();
+
+        // remove the node in the skiplist
+        for (int lvl = 0; lvl < removeNodeLevels; lvl++) {
+            if (removePath.get(lvl) == null) { // flag for the heads pointers
+                heads.set(lvl,removeNode.next(lvl));
+            } else { // affects a node
+                removePath.get(lvl).setNext(lvl, removeNode.next(lvl));                
+            }
+        }
+        count--;
+        return true;
+    }
+
+    // initial version written by Dr. Albert
+    public boolean testRemove(boolean verbose)  {
+        //creates a new SkipList called testList
+        List<Integer> testList = new SkipList<Integer>();
+
+        testList.add(4);
+        testList.add(10);
+        testList.add(7);
+
+        if (testList.remove(new Integer(5)) == true) {
+            return false;
+        }
+        if (testList.remove(new Integer(7)) == false) {
+            return false;
+        }
+        if (testList.remove(new Integer(4)) == false) {
+            return false;
+        }
+
+        return (
+            (testList.get(0) == 10) &&
+            (testList.size() == 1)
+        );
+    } 
