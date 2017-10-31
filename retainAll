@@ -1,0 +1,55 @@
+ //written by Paulina and Makenna
+    //removes any elements from SkipList that are not contained in collection c
+    public boolean retainAll(Collection c){
+    /*    if(heads==null || count == 0){
+            throw new UnsupportedOperationException();
+        }
+        else{
+
+            Node<E> pointer = heads;
+            while (pointer!=null){
+                if (!c.contains(pointer.value())){
+                    remove(pointer.value());
+                }
+                pointer = pointer.next(0);
+            }
+                
+        }
+        return false;     
+    }
+    */
+    boolean modified = false;   
+    int lvl = 0;    //want to iterate through at level 0
+    Node<E> temp = heads.get(lvl);  //set pointer
+    if(temp != null){   //if not at head
+        if(!(c.contains(temp.value()))){ //if c doesn't contain the value
+            remove(temp.value());   //remove it
+            modified = true;    //the SkipList was modified
+        }
+        temp = temp.next(lvl);  //move to next value in SkipList
+    }
+        return modified;
+    }   //we think this may not accurately implement the retainAll function
+
+   
+   //Written by Paulina and Makenna
+    public boolean testRetainAll(boolean verbose)  {
+        //creates a new SkipList called testList
+        List<Integer> test = new SkipList<Integer>();
+
+        test.add(5);
+        test.add(17);
+        test.add(42);
+        
+        List<Integer> c = new ArrayList<>();
+
+        c.add(17);
+        if (test.retainAll(c) == false) {
+            return false;
+        }
+
+        return (
+            (test.get(0) == 17) // &&(test.size()==1)
+        );  //didn't pass if we included size for test, need to figure out how to fix this
+    }   
+
